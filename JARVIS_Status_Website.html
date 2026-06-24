@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS Status</title>
+<link rel="icon" type="image/png" href="jarvis.png">
+<style>
+:root{
+--bg:#0b0d12;--card:#121821;--border:#232c3a;--text:#fff;--muted:#a5afbd;
+--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Segoe UI,sans-serif}
+body{background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1100px;margin:auto;padding:40px 20px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:50px}
+.logo{display:flex;align-items:center;gap:15px}
+.logo img{width:60px;height:60px}
+.subscribe{padding:12px 22px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
+.hero{background:var(--card);border:1px solid var(--border);padding:30px;border-radius:20px;margin-bottom:30px}
+.ok{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:700}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--green)}
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin:25px 0}
+.service{background:var(--card);border:1px solid var(--border);padding:18px;border-radius:16px}
+.service div{display:flex;justify-content:space-between}
+.incident{border:2px solid var(--red);background:rgba(239,68,68,.06);padding:20px;border-radius:18px;margin-bottom:15px}
+.incident h3{color:var(--red)}
+.history{max-height:500px;overflow-y:auto}
+.item{background:var(--card);border:1px solid var(--border);padding:18px;border-radius:16px;margin:12px 0}
+footer{text-align:center;margin-top:40px;color:var(--muted)}
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(12px);
+    z-index:9999;
+}
+
+.modal-content{
+
+    position:relative;
+
+    width:520px;
+    max-width:92%;
+
+    margin:100px auto;
+
+    background:#10151d;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:28px;
+
+    padding:40px;
+
+    overflow:hidden;
+
+    text-align:center;
+}
+
+.jarvis-glow{
+
+    position:absolute;
+
+    width:350px;
+    height:350px;
+
+    background:#ef4444;
+
+    filter:blur(140px);
+
+    opacity:.20;
+
+    top:-120px;
+    left:50%;
+
+    transform:translateX(-50%);
+}
+
+.jarvis-logo{
+
+    width:90px;
+    height:90px;
+
+    object-fit:contain;
+
+    margin-bottom:15px;
+
+    position:relative;
+    z-index:2;
+}
+
+.modal-content h2{
+    position:relative;
+    z-index:2;
+}
+
+.modal-content p{
+    color:#9ca3af;
+    margin-top:10px;
+    margin-bottom:25px;
+    position:relative;
+    z-index:2;
+}
+
+.modal-content input{
+
+    width:100%;
+
+    padding:16px;
+
+    border-radius:14px;
+
+    border:1px solid #2d3748;
+
+    background:#0b0d12;
+
+    color:white;
+
+    font-size:15px;
+
+    margin-bottom:15px;
+}
+
+.modal-content input:focus{
+
+    outline:none;
+
+    border-color:#ef4444;
+
+    box-shadow:
+    0 0 25px rgba(239,68,68,.25);
+}
+
+.submit-btn{
+
+    width:100%;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:14px;
+
+    color:white;
+
+    font-weight:700;
+
+    font-size:15px;
+
+    cursor:pointer;
+
+    background:
+    linear-gradient(
+    135deg,
+    #ef4444,
+    #991b1b
+    );
+
+    transition:.25s;
+}
+
+.submit-btn:hover{
+
+    transform:
+    translateY(-3px);
+
+    box-shadow:
+    0 0 30px rgba(239,68,68,.4);
+}
+
+.close-btn{
+
+    position:absolute;
+
+    right:18px;
+    top:18px;
+
+    width:38px;
+    height:38px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#1b2431;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+#successCheck{
+
+    display:none;
+
+    margin-top:25px;
+}
+
+.checkmark{
+
+    width:70px;
+    height:70px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    background:#22c55e;
+
+    color:white;
+
+    font-size:38px;
+
+    line-height:70px;
+
+    animation:pop .4s ease;
+}
+
+@keyframes pop{
+
+    0%{
+        transform:scale(.5);
+        opacity:0;
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<div class="logo">
+<img src="jarvis.png" alt="JARVIS Logo">
+<div>
+<h1>JARVIS Status</h1>
+<p style="color:#a5afbd">System health & incident tracking</p>
+</div>
+</div>
+<button id="openModal" class="subscribe-btn">
+    Subscribe to Updates
+</button>
+<div id="subscribeModal" class="modal">
+
+    <div class="modal-content">
+
+        <button id="closeModal" class="close-btn">
+            ✕
+        </button>
+
+        <div class="jarvis-glow"></div>
+
+        <img
+            src="jarvis.png"
+            class="jarvis-logo"
+            alt="JARVIS">
+
+        <h2>Subscribe to JARVIS Updates</h2>
+
+        <p>
+            Get notified about incidents, maintenance,
+            AI upgrades, new releases and platform updates.
+        </p>
+
+        <form id="subscribeForm">
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email address"
+                required>
+
+            <button
+                type="submit"
+                class="submit-btn">
+
+                Subscribe
+
+            </button>
+
+        </form>
+
+        <div id="successCheck">
+
+            <div class="checkmark">
+                ✓
+            </div>
+
+            <p>
+                Successfully subscribed!
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+</header>
+
+<section class="hero">
+<div class="ok"><span class="dot"></span> All Systems Operational</div>
+<p style="margin-top:12px;color:#a5afbd">JARVIS core services are running normally.</p>
+</section>
+
+<h2>Services</h2>
+<div class="services">
+<div class="service"><div><span>AI Engine</span><span>🟢</span></div></div>
+<div class="service"><div><span>Voice Assistant</span><span>🟢</span></div></div>
+<div class="service"><div><span>Wake Word Listener</span><span>🟢</span></div></div>
+<div class="service"><div><span>Memory System</span><span>🟢</span></div></div>
+<div class="service"><div><span>Face Recognition</span><span>🟢</span></div></div>
+<div class="service"><div><span>Security Layer</span><span>🟢</span></div></div>
+<div class="service"><div><span>Ollama Backend</span><span>🟢</span></div></div>
+</div>
+
+<h2 style="margin:30px 0 15px">Recent Incidents</h2>
+<div class="incident">
+<h3>Voice Recognition Delay</h3>
+<p>Wake-word processing latency affected some users. Issue resolved.</p>
+</div>
+
+<div class="incident">
+<h3>Scheduled Ollama Upgrade</h3>
+<p>Backend infrastructure upgraded successfully.</p>
+</div>
+
+<h2 style="margin:30px 0 15px">Incident History</h2>
+<div class="history">
+<div class="item"><strong>Memory Database Optimisation</strong><br>Improved retrieval performance.</div>
+<div class="item"><strong>Face Recognition Improvements</strong><br>Authentication accuracy increased.</div>
+<div class="item"><strong>JARVIS Core Update</strong><br>Performance and stability enhancements.</div>
+<div class="item"><strong>Voice Engine Upgrade</strong><br>Reduced recognition errors.</div>
+<div class="item"><strong>Security Maintenance</strong><br>Routine security improvements.</div>
+</div>
+
+<footer>© 2026 JARVIS Status</footer>
+</div>
+<script>
+const modal =
+document.getElementById("subscribeModal");
+
+document
+.getElementById("openModal")
+.onclick = () =>
+modal.style.display = "block";
+
+document
+.getElementById("closeModal")
+.onclick = () =>
+modal.style.display = "none";
+
+window.onclick = (e)=>{
+
+    if(e.target===modal){
+
+        modal.style.display="none";
+
+    }
+
+};
+
+document
+.getElementById("subscribeForm")
+.addEventListener("submit",
+async function(e){
+
+    e.preventDefault();
+
+    const email =
+    document.getElementById("email").value;
+
+    await fetch(
+        "https://script.google.com/macros/s/AKfycbz6hlieg_mNVRaTGZ-e73wtn-gmieKI3NGn-Q-Peob0n3vEQVo_klfwmmqFsRZtoB3K/exec",
+        {
+            method:"POST",
+            body:JSON.stringify({
+                email:email
+            })
+        }
+    );
+
+    document
+    .getElementById("successCheck")
+    .style.display="block";
+
+    this.style.display="none";
+
+});
+
+</script>
+<div id="subscribeModal" class="modal">
+
+    <div class="modal-content">
+
+        <span id="closeModal" class="close">
+            &times;
+        </span>
+
+        <h2>Stay Updated</h2>
+
+        <p>
+            Get notified about incidents, maintenance,
+            feature releases and JARVIS updates.
+        </p>
+
+        <form id="subscribeForm">
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email address"
+                required>
+
+            <button type="submit" class="submit-btn">
+                Subscribe
+            </button>
+
+        </form>
+
+        <div id="successMessage">
+            ✓ Successfully subscribed!
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

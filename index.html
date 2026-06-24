@@ -231,6 +231,128 @@ footer{text-align:center;margin-top:40px;color:var(--muted)}
         opacity:1;
     }
 }
+
+.subscribe-btn{
+
+    background:
+    linear-gradient(
+        135deg,
+        #ff1e1e,
+        #8b0000
+    );
+
+    color:white;
+
+    border:none;
+
+    padding:14px 28px;
+
+    border-radius:14px;
+
+    font-weight:800;
+
+    font-size:15px;
+
+    cursor:pointer;
+
+    position:relative;
+
+    overflow:hidden;
+
+    transition:.3s;
+
+    box-shadow:
+    0 0 25px rgba(255,0,0,.35);
+}
+
+.subscribe-btn:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+    0 0 40px rgba(255,0,0,.6);
+}
+
+.subscribe-btn::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-100%;
+
+    width:100%;
+    height:100%;
+
+    background:
+    linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.3),
+        transparent
+    );
+
+    transition:.6s;
+}
+
+.subscribe-btn:hover::before{
+
+    left:100%;
+}
+
+.success-circle{
+
+    width:90px;
+    height:90px;
+
+    margin:auto;
+
+    animation:pop .5s ease;
+}
+
+.success-circle svg{
+
+    width:100%;
+    height:100%;
+}
+
+.success-circle circle{
+
+    stroke:#22c55e;
+    stroke-width:2;
+
+    stroke-dasharray:160;
+    stroke-dashoffset:160;
+
+    animation:drawCircle .8s forwards;
+}
+
+.success-circle path{
+
+    stroke:#22c55e;
+    stroke-width:3;
+
+    stroke-dasharray:50;
+    stroke-dashoffset:50;
+
+    animation:
+        drawCheck .4s .7s forwards;
+}
+
+@keyframes drawCircle{
+
+    to{
+        stroke-dashoffset:0;
+    }
+}
+
+@keyframes drawCheck{
+
+    to{
+        stroke-dashoffset:0;
+    }
+}
 </style>
 </head>
 <body>
@@ -287,13 +409,29 @@ footer{text-align:center;margin-top:40px;color:var(--muted)}
         </form>
 
         <div id="successCheck">
+		
+		    <div class="success-circle">
 
-            <div class="checkmark">
-                ✓
+                <svg viewBox="0 0 52 52">
+
+                    <circle
+					    cx="26"
+                        cy="26"
+                        r="25"
+                        fill="none"/>
+
+                    <path
+                        fill="none"
+                        d="M14 27 L22 35 L38 18"/>
+
+                </svg>
+
             </div>
 
+            <h3>Subscription Confirmed</h3>
+
             <p>
-                Successfully subscribed!
+                Updates will be sent to your email.
             </p>
 
         </div>
@@ -394,41 +532,5 @@ async function(e){
 });
 
 </script>
-<div id="subscribeModal" class="modal">
-
-    <div class="modal-content">
-
-        <span id="closeModal" class="close">
-            &times;
-        </span>
-
-        <h2>Stay Updated</h2>
-
-        <p>
-            Get notified about incidents, maintenance,
-            feature releases and JARVIS updates.
-        </p>
-
-        <form id="subscribeForm">
-
-            <input
-                type="email"
-                id="email"
-                placeholder="Enter your email address"
-                required>
-
-            <button type="submit" class="submit-btn">
-                Subscribe
-            </button>
-
-        </form>
-
-        <div id="successMessage">
-            ✓ Successfully subscribed!
-        </div>
-
-    </div>
-
-</div>
 </body>
 </html>

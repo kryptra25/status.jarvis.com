@@ -435,6 +435,18 @@ footer{text-align:center;margin-top:40px;color:var(--muted)}
             </p>
 
         </div>
+		
+		<div id="alreadySubscribed" style="display:none;">
+
+            <h3 style="color:#f59e0b;">
+                Already Subscribed
+            </h3>
+
+            <p>
+                This email is already receiving JARVIS AI updates.
+            </p>
+
+        </div>
 
     </div>
 
@@ -513,8 +525,9 @@ async function(e){
     const email =
     document.getElementById("email").value;
 
+    const response =
     await fetch(
-        "https://script.google.com/macros/s/AKfycbz6hlieg_mNVRaTGZ-e73wtn-gmieKI3NGn-Q-Peob0n3vEQVo_klfwmmqFsRZtoB3K/exec",
+	    "https://script.google.com/macros/s/AKfycbz6hlieg_mNVRaTGZ-e73wtn-gmieKI3NGn-Q-Peob0n3vEQVo_klfwmmqFsRZtoB3K/exec",
         {
             method:"POST",
             body:JSON.stringify({
@@ -523,11 +536,28 @@ async function(e){
         }
     );
 
-    document
-    .getElementById("successCheck")
-    .style.display="block";
+    const result =
+    await response.json();
 
-    this.style.display="none";
+    if(result.status === "success"){
+
+        document
+        .getElementById("successCheck")
+        .style.display = "block";
+
+        this.style.display = "none";
+
+    }
+
+    else if(result.status === "exists"){
+
+        document
+        .getElementById("alreadySubscribed")
+        .style.display = "block";
+
+        this.style.display = "none";
+
+    }
 
 });
 

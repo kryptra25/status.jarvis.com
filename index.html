@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JARVIS Status</title>
 <link rel="icon" type="image/png" href="jarvis.png">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
 :root{
 --bg:#0b0d12;--card:#121821;--border:#232c3a;--text:#fff;--muted:#a5afbd;
@@ -397,6 +398,11 @@ footer{text-align:center;margin-top:40px;color:var(--muted)}
                 id="email"
                 placeholder="Enter your email address"
                 required>
+			
+			<div
+                class="g-recaptcha"
+                data-sitekey="6LeYdTItAAAAAChqKG9PFq7ME5_Xh_p_gGZB8YSG">
+            </div>
 
             <button
                 type="submit"
@@ -437,6 +443,21 @@ footer{text-align:center;margin-top:40px;color:var(--muted)}
         </div>
 		
 		<div id="alreadySubscribed" style="display:none;">
+
+            <div class="success-circle">
+
+                <svg viewBox="0 0 52 52">
+
+                    <circle
+                        cx="26"
+                        cy="26"
+                        r="25"
+                        fill="none"
+                        stroke="#f59e0b"/>
+
+                </svg>
+
+            </div>
 
             <h3 style="color:#f59e0b;">
                 Already Subscribed
@@ -524,10 +545,22 @@ async function(e){
 
     const email =
     document.getElementById("email").value;
+	
+	const captcha =
+    grecaptcha.getResponse();
+
+    if(!captcha){
+
+        alert(
+            "Please verify that you are not a robot."
+        );
+
+        return;
+    }
 
     const response =
     await fetch(
-	    "https://script.google.com/macros/s/AKfycbz6hlieg_mNVRaTGZ-e73wtn-gmieKI3NGn-Q-Peob0n3vEQVo_klfwmmqFsRZtoB3K/exec",
+        "https://script.google.com/macros/s/AKfycbz6hlieg_mNVRaTGZ-e73wtn-gmieKI3NGn-Q-Peob0n3vEQVo_klfwmmqFsRZtoB3K/exec",
         {
             method:"POST",
             body:JSON.stringify({

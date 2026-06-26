@@ -1,903 +1,383 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. | Advanced AI Assistant</title>
-    <link rel="icon" href="jarvis.png" type="image/jpeg">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-    
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS Status</title>
+<link rel="icon" type="image/png" href="jarvis.png">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<style>
+:root{
+--bg:#0b0d12;--card:#121821;--border:#232c3a;--text:#fff;--muted:#a5afbd;
+--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Segoe UI,sans-serif}
+body{background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1100px;margin:auto;padding:40px 20px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:50px}
+.logo{display:flex;align-items:center;gap:15px}
+.logo img{width:60px;height:60px}
+.subscribe{padding:12px 22px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
+.hero{background:var(--card);border:1px solid var(--border);padding:30px;border-radius:20px;margin-bottom:30px}
+.ok{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:700}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--green)}
+.dot.down{background:var(--red)} /* Added .down class for red dot */
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin:25px 0}
+.service{background:var(--card);border:1px solid var(--border);padding:18px;border-radius:16px}
+.service div{display:flex;justify-content:space-between}
+.incident{border:2px solid var(--red);background:rgba(239,68,68,.06);padding:20px;border-radius:18px;margin-bottom:15px}
+.incident h3{color:var(--red)}
+.history{max-height:500px;overflow-y:auto}
+.item{background:var(--card);border:1px solid var(--border);padding:18px;border-radius:16px;margin:12px 0}
+footer{text-align:center;margin-top:40px;color:var(--muted)}
 
-    <style>
-        :root {
-            --cyan: #00d2ff;
-            --dark-cyan: #03719c;
-            --bg-dark: #05080a;
-            --text-main: #e0f7fa;
-            --panel-bg: rgba(0, 210, 255, 0.05);
-            --border-glow: 0 0 15px rgba(0, 210, 255, 0.4);
-        }
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(12px);
+    z-index:9999;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Rajdhani', sans-serif;
-        }
+.modal-content{
+    position:relative;
+    width:520px;
+    max-width:92%;
+    margin:100px auto;
+    background:#10151d;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    padding:40px;
+    overflow:hidden;
+    text-align:center;
+}
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            background-image: radial-gradient(circle at center, #0a1118 0%, #000000 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+.jarvis-glow{
+    position:absolute;
+    width:350px;
+    height:350px;
+    background:#ef4444;
+    filter:blur(140px);
+    opacity:.20;
+    top:-120px;
+    left:50%;
+    transform:translateX(-50%);
+}
 
-        h1, h2, h3, .nav-links a {
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+.jarvis-logo{
+    width:90px;
+    height:90px;
+    object-fit:contain;
+    margin-bottom:15px;
+    position:relative;
+    z-index:2;
+}
 
-        /* Navigation */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 50px;
-            background: rgba(5, 8, 10, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--dark-cyan);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
+.modal-content h2{
+    position:relative;
+    z-index:2;
+}
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+.modal-content p{
+    color:#9ca3af;
+    margin-top:10px;
+    margin-bottom:25px;
+    position:relative;
+    z-index:2;
+}
 
-        .logo-container img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            box-shadow: var(--border-glow);
-            animation: pulse 2s infinite;
-        }
+.modal-content input{
+    width:100%;
+    padding:16px;
+    border-radius:14px;
+    border:1px solid #2d3748;
+    background:#0b0d12;
+    color:white;
+    font-size:15px;
+    margin-bottom:15px;
+}
 
-        .logo-text {
-            font-size: 1.5rem;
-            color: var(--cyan);
-            text-shadow: 0 0 10px var(--cyan);
-        }
+.modal-content input:focus{
+    outline:none;
+    border-color:#ef4444;
+    box-shadow:0 0 25px rgba(239,68,68,.25);
+}
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
+.submit-btn{
+    width:100%;
+    padding:16px;
+    margin-top:15px;
+    border:none;
+    border-radius:14px;
+    color:white;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+    background:linear-gradient(135deg,#ef4444,#991b1b);
+    transition:.25s;
+}
 
-        .nav-links a {
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 1rem;
-            transition: 0.3s;
-            cursor: pointer;
-        }
+.submit-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 0 30px rgba(239,68,68,.4);
+}
 
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--cyan);
-            text-shadow: 0 0 8px var(--cyan);
-        }
+.submit-btn:disabled{
+    opacity:.7;
+    cursor:not-allowed;
+}
 
-        /* Hamburger Icon (Hidden on Desktop) */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            cursor: pointer;
-            z-index: 1001;
-        }
+.close-btn{
+    position:absolute;
+    right:18px;
+    top:18px;
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:50%;
+    background:#1b2431;
+    color:white;
+    cursor:pointer;
+}
 
-        .hamburger span {
-            width: 30px;
-            height: 3px;
-            background-color: var(--cyan);
-            border-radius: 2px;
-            transition: 0.3s;
-            box-shadow: 0 0 5px var(--cyan);
-        }
+#successCheck{
+    display:none;
+    margin-top:25px;
+}
 
-        /* Page Content */
-        .page {
-            display: none;
-            padding: 120px 50px 50px;
-            max-width: 1200px;
-            margin: 0 auto;
-            animation: fadeIn 0.5s ease-in;
-        }
+.checkmark{
+    width:70px;
+    height:70px;
+    margin:auto;
+    border-radius:50%;
+    background:#22c55e;
+    color:white;
+    font-size:38px;
+    line-height:70px;
+    animation:pop .4s ease;
+}
 
-        .page.active {
-            display: block;
-        }
+@keyframes pop{
+    0%{transform:scale(.5);opacity:0;}
+    100%{transform:scale(1);opacity:1;}
+}
 
-        /* Hero Section */
-        .hero {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-            margin-top: 20px;
-        }
+.subscribe-btn{
+    background:linear-gradient(135deg,#ff1e1e,#8b0000);
+    color:white;
+    border:none;
+    padding:14px 28px;
+    border-radius:14px;
+    font-weight:800;
+    font-size:15px;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:.3s;
+    box-shadow:0 0 25px rgba(255,0,0,.35);
+}
 
-        .hero-content {
-            flex: 1;
-        }
+.subscribe-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 0 40px rgba(255,0,0,.6);
+}
 
-        .hero h1 {
-            font-size: 3.5rem;
-            color: var(--cyan);
-            text-shadow: 0 0 15px var(--cyan);
-            margin-bottom: 20px;
-        }
+.subscribe-btn::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+    transition:.6s;
+}
 
-        .hero p {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            color: #b2ebf2;
-        }
+.subscribe-btn:hover::before{
+    left:100%;
+}
 
-        .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            background: transparent;
-            color: var(--cyan);
-            border: 1px solid var(--cyan);
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            text-decoration: none;
-            font-weight: bold;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: inset 0 0 10px rgba(0, 210, 255, 0.2);
-        }
+.success-circle{
+    width:90px;
+    height:90px;
+    margin:auto;
+    animation:pop .5s ease;
+}
 
-        .btn:hover {
-            background: var(--cyan);
-            color: #000;
-            box-shadow: 0 0 20px var(--cyan);
-        }
+.success-circle svg{
+    width:100%;
+    height:100%;
+}
 
-        .hero-image {
-            flex: 1;
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid var(--dark-cyan);
-            box-shadow: var(--border-glow);
-        }
+.success-circle circle{
+    stroke:#22c55e;
+    stroke-width:2;
+    stroke-dasharray:160;
+    stroke-dashoffset:160;
+    animation:drawCircle .8s forwards;
+}
 
-        .hero-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+.success-circle path{
+    stroke:#22c55e;
+    stroke-width:3;
+    stroke-dasharray:50;
+    stroke-dashoffset:50;
+    animation:drawCheck .4s .7s forwards;
+}
 
-        /* Info Sections (Home Scrollable Content) */
-        .info-section {
-            margin-top: 100px;
-            display: flex;
-            align-items: center;
-            gap: 40px;
-        }
-        
-        .info-section.reverse {
-            flex-direction: row-reverse;
-        }
+@keyframes drawCircle{
+    to{stroke-dashoffset:0;}
+}
 
-        .info-section h2 {
-            font-size: 2.5rem;
-            color: var(--cyan);
-            margin-bottom: 20px;
-        }
-
-        .info-section p {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: #b2ebf2;
-            margin-bottom: 15px;
-        }
-
-        .info-image {
-            flex: 1;
-            border-radius: 10px;
-            border: 1px solid var(--dark-cyan);
-            box-shadow: var(--border-glow);
-            overflow: hidden;
-        }
-
-        .info-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .info-content {
-            flex: 1;
-        }
-
-        /* Sections Grid */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .card {
-            background: var(--panel-bg);
-            border: 1px solid var(--dark-cyan);
-            padding: 30px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--border-glow);
-        }
-
-        .card h3 {
-            color: var(--cyan);
-            margin-bottom: 15px;
-        }
-
-        /* Forms */
-        .form-container {
-            background: var(--panel-bg);
-            border: 1px solid var(--dark-cyan);
-            padding: 40px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-            max-width: 600px;
-            margin: 40px auto 0;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--cyan);
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 1px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--dark-cyan);
-            color: #fff;
-            border-radius: 5px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.1rem;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .form-control:focus {
-            box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
-            border-color: var(--cyan);
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--cyan);
-            cursor: pointer;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-content {
-            background: #05080a;
-            border: 1px solid var(--cyan);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.5);
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            color: var(--cyan);
-            font-size: 1.5rem;
-            cursor: pointer;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        /* Chatbot Widget */
-        .chatbot-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: #000;
-            border: 2px solid var(--cyan);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: var(--border-glow);
-            z-index: 1001;
-        }
-
-        .chatbot-btn img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-
-        .chat-window {
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            width: 350px;
-            height: 450px;
-            background: rgba(5, 8, 10, 0.95);
-            border: 1px solid var(--cyan);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
-            display: none;
-            flex-direction: column;
-            z-index: 1001;
-            backdrop-filter: blur(10px);
-        }
-
-        .chat-header {
-            background: rgba(0, 210, 255, 0.1);
-            padding: 15px;
-            border-bottom: 1px solid var(--dark-cyan);
-            font-family: 'Orbitron', sans-serif;
-            color: var(--cyan);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .close-chat {
-            cursor: pointer;
-            color: var(--text-main);
-        }
-
-        .chat-body {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .chat-msg {
-            padding: 10px 15px;
-            border-radius: 5px;
-            max-width: 80%;
-        }
-
-        .msg-ai {
-            background: rgba(0, 210, 255, 0.1);
-            border-left: 2px solid var(--cyan);
-            align-self: flex-start;
-        }
-
-        .msg-user {
-            background: rgba(255, 255, 255, 0.05);
-            border-right: 2px solid #fff;
-            align-self: flex-end;
-            color: #fff;
-        }
-
-        .chat-input {
-            display: flex;
-            padding: 15px;
-            border-top: 1px solid var(--dark-cyan);
-        }
-
-        .chat-input input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            outline: none;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1rem;
-        }
-
-        .chat-input button {
-            background: transparent;
-            border: none;
-            color: var(--cyan);
-            cursor: pointer;
-            font-weight: bold;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        /* Animations */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.4); }
-            50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.8); }
-            100% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.4); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Responsive Mobile Settings */
-        @media (max-width: 768px) {
-            nav {
-                padding: 15px 30px;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .nav-links {
-                display: none; /* Hidden on mobile by default */
-                flex-direction: column;
-                position: absolute;
-                top: 80px; /* Sits just below the nav bar */
-                left: 0;
-                width: 100%;
-                background: rgba(5, 8, 10, 0.95);
-                backdrop-filter: blur(15px);
-                border-bottom: 1px solid var(--cyan);
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.8);
-                padding: 20px 0;
-                text-align: center;
-                gap: 20px;
-            }
-
-            /* This class is added via JavaScript when the hamburger is clicked */
-            .nav-links.active-menu {
-                display: flex;
-            }
-
-            .hero, .info-section, .info-section.reverse { 
-                flex-direction: column; 
-            }
-            .info-image { 
-                width: 100%; 
-            }
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-        }
-    </style>
+@keyframes drawCheck{
+    to{stroke-dashoffset:0;}
+}
+</style>
 </head>
 <body>
+<div class="container">
+<header>
+<div class="logo">
+<img src="jarvis.png" alt="JARVIS Logo">
+<div>
+<h1>JARVIS Status</h1>
+<p style="color:#a5afbd">System health & incident tracking</p>
+</div>
+</div>
+<button id="openModal" class="subscribe-btn">
+    Subscribe to Updates
+</button>
+<div id="subscribeModal" class="modal">
+    <div class="modal-content">
+        <button id="closeModal" class="close-btn">✕</button>
+        <div class="jarvis-glow"></div>
+        <img src="jarvis.png" class="jarvis-logo" alt="JARVIS">
+        <h2>Subscribe to JARVIS Updates</h2>
+        <p>Get notified about incidents, maintenance, AI upgrades, new releases and platform updates.</p>
+        <form id="subscribeForm">
+            <input type="email" id="email" placeholder="Enter your email address" required>
+			<div class="g-recaptcha" data-sitekey="6LeYdTItAAAAAChqKG9PFq7ME5_Xh_p_gGZB8YSG"></div>
+            <button type="submit" class="submit-btn">Subscribe</button>
+        </form>
 
-    <nav>
-        <div class="logo-container">
-            <img src="jarvis.png" alt="JARVIS Logo">
-            <div class="logo-text">J.A.R.V.I.S.</div>
+        <div id="successCheck">
+		    <div class="success-circle">
+                <svg viewBox="0 0 52 52">
+                    <circle cx="26" cy="26" r="25" fill="none"/>
+                    <path fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M14 27 L22 35 L38 18"/>
+                </svg>
+            </div>
+            <h3>Subscription Confirmed</h3>
+            <p>Updates will be sent to your email.</p>
         </div>
-        
-        <div class="hamburger" onclick="toggleMobileMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-
-        <div class="nav-links" id="navLinks">
-            <a onclick="showPage('home')" class="active" id="nav-home">System Overview</a>
-            <a onclick="showPage('about')" id="nav-about">Protocols</a>
-            <a onclick="showPage('download')" id="nav-download">Desktop Access</a>
-            <a onclick="showPage('mobile')" id="nav-mobile">Mobile Uplink</a>
-            <a onclick="showPage('contact')" id="nav-contact">Secure Comms</a>
-        </div>
-    </nav>
-
-    <div id="home" class="page active">
-        <div class="hero">
-            <div class="hero-content">
-                <h1>Just A Rather Very Intelligent System</h1>
-                <p>Welcome to the next evolution of personal computing. J.A.R.V.I.S. is a new and improved AI assistant tailored for your daily needs. From managing your schedule and automating workflows to providing real-time data analysis, the system operates seamlessly in the background of your life.</p>
-                <a onclick="showPage('download')" class="btn">Initiate Download</a>
+		
+		<div id="alreadySubscribed" style="display:none;">
+            <div class="success-circle">
+                <svg viewBox="0 0 52 52">
+                    <circle cx="26" cy="26" r="25" fill="none"/>
+                    <path fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M14 27 L22 35 L38 18"/>
+                </svg>
             </div>
-            <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop" alt="Futuristic Tech UI">
-            </div>
-        </div>
-
-        <div class="info-section">
-            <div class="info-content">
-                <h2>The Inspiration</h2>
-                <p>Bridging the gap between cinematic science fiction and tangible reality, J.A.R.V.I.S. was born from the desire to create a truly conversational, proactive digital companion. New AI assistants are built on simple typing and answering questions, but our software makes automation much easier.</p>
-                <p>Inspired by the iconic J.A.R.V.I.S. assistant from the Iron Man movies. The goal of this project is to bring a similar AI experience into the real world by creating an intelligent assistant that can communicate through voice, understand commands, automate tasks, remember information, and help manage everyday computer activities. Combining advanced AI, voice interaction, and a futuristic interface, JARVIS AI aims to make human-computer interaction more natural, efficient, and immersive.</p>
-            </div>
-            <div class="info-image">
-                <img src="iron_man.jpeg" alt="iron man example">
-            </div>
-        </div>
-
-        <div class="info-section reverse">
-            <div class="info-content">
-                <h2>Future Advancements</h2>
-                <p>We are constantly pushing the boundaries of what machine intelligence can achieve. Current development cycles are focused on making a mobile version and working on better automation.</p>
-                <p>Upcoming patches will include deeper device control such as smart home control and integrated Alexa skill.</p>
-            </div>
-            <div class="info-image">
-                <img src="advancements.png" alt="jarvis_advancements">
-            </div>
-        </div>
-
-        <div class="info-section">
-            <div class="info-content">
-                <h2>JARVIS AI Team</h2>
-                <p>Headquartered in Europe, first project from the JARVIS AI Team</p>
-                <p><strong>Our Team:</strong> One man solo team starting up with this amazing and futuristic project consisting of an assistant that we all wanted to this day.</p>
-            </div>
-            <div class="info-image">
-                <img src="jarvis_team.jpg" alt="Cyber security server room">
-            </div>
+            <h3 style="color:#f59e0b;">Already Subscribed</h3>
+            <p>This email is already receiving JARVIS AI updates.</p>
         </div>
     </div>
+</div>
+</header>
 
-    <div id="about" class="page">
-        <h2>System Protocols & Capabilities</h2>
-        <div class="grid-container">
-            <div class="card">
-                <h3>Biometric Security</h3>
-                <p>J.A.R.V.I.S. utilizes advanced facial recognition to scan and authenticate users, ensuring custom profiles and system data are completely protected.</p>
-            </div>
-            <div class="card">
-                <h3>Voice & Wake Word Detection</h3>
-                <p>Continuously listening for its custom wake word, J.A.R.V.I.S. captures voice commands using Vosk integration for highly accurate speech-to-text processing.</p>
-            </div>
-            <div class="card">
-                <h3>Streamed AI Processing</h3>
-                <p>Leveraging advanced neural networks, responses are streamed in real-time, allowing the assistant to speak sentences dynamically as they are formulated.</p>
-            </div>
-            <div class="card">
-                <h3>Multi-User Profiles</h3>
-                <p>Create separate user environments. The system remembers your name, birthday, custom wake word configurations, and personalized preferences.</p>
-            </div>
-            <div class="card">
-                <h3>System Automation</h3>
-                <p>Directly control your machine. Execute desktop commands, fetch weather integrations, initiate sleep modes, or perform secure system shutdowns via voice.</p>
-            </div>
-            <div class="card">
-                <h3>Desktop Integration</h3>
-                <p>Includes a dedicated system tray icon and an interactive graphical user interface (GUI) to monitor processing statuses and type commands silently.</p>
-            </div>
-			<div class="card">
-                <h3>Command Automation</h3>
-                <p>Tailored commands that AI will follow quickly and efficiently.</p>
-            </div>
-			<div class="card">
-                <h3>JARVIS Personality</h3>
-                <p>Has the exact personality of JARVIS from Iron Man movies and has an excellent British voice just like in the movies.</p>
-            </div>
-			<div class="card">
-                <h3>Spotify Control</h3>
-                <p>Spotify control integration comes with auto searching any song or opening any playlist of user's choice.</p>
-            </div>
-			<div class="card">
-                <h3>Memory System</h3>
-                <p>Super smart memory system that is unique for every profile and remembers everything for the user.</p>
-            </div>
-			<div class="card">
-                <h3>Security Firewall</h3>
-                <p>Security layer in computer that is unbreakable, equipped with connection to face recognition, photo & video alert system and intruder system with safe code.</p>
-            </div>
-			<div class="card">
-                <h3>Image Generation</h3>
-                <p>⚠️STILL UNDER CONSTRUCTION⚠️</p>
-            </div>
-			<div class="card">
-                <h3>Multi-AI Model System</h3>
-                <p>Can change to any model desired. Various models to choose from and all for FREE.</p>
-            </div>
-			<div class="card">
-                <h3>Image and File Attachments</h3>
-                <p>Any Image or File can be attached and used for reference when talking to AI.</p>
-            </div>
-			<div class="card">
-                <h3>Mobile Version</h3>
-                <p>⚠️STILL UNDER CONSTRUCTION⚠️</p>
-            </div>
-			<div class="card">
-                <h3>Smart Home Control</h3>
-                <p>⚠️STILL UNDER CONSTRUCTION⚠️</p>
-            </div>
-			<div class="card">
-                <h3>Integrated Alexa Skill</h3>
-                <p>⚠️STILL UNDER CONSTRUCTION⚠️</p>
-            </div>
-        </div>
-    </div>
+<section class="hero" style="border-color: var(--green);">
+<div class="ok" style="color: var(--green);"><span class="dot"></span> All Systems Operational</div>
+<p style="margin-top:12px;color:#a5afbd">JARVIS is fully funtional and is not experiencing any issues.</p>
+</section>
 
-    <div id="download" class="page">
-        <h2>Desktop Access Terminal</h2>
-        <p style="margin-top: 20px; font-size: 1.2rem; color: #b2ebf2;">Select your operating system to install the J.A.R.V.I.S. core module.</p>
-        
-        <div class="grid-container">
-            <div class="card" style="text-align: center;">
-                <h3>Windows (x64)</h3>
-                <p style="margin-bottom: 20px;">Beta Version 1.0 | Requires Windows 10+</p>
-                <a href="https://github.com/kryptra25/jarvis.com/releases/download/v1.0/JARVISSetup.exe" class="btn">Download .EXE</a>
-            </div>
-            <div class="card" style="text-align: center;">
-                <h3>mac OS (Silicon/Intel)</h3>
-                <p style="margin-bottom: 20px;">Beta Version 1.0 | Requires macOS 12+</p>
-                <a href="#" class="btn">⚠️STILL UNDER CONSTRUCTION⚠️</a>
-            </div>
-            <div class="card" style="text-align: center;">
-                <h3>Linux (Debian)</h3>
-                <p style="margin-bottom: 20px;">Beta Version 1.0 | Requires Ubuntu 20.04+</p>
-                <a href="#" class="btn">⚠️STILL UNDER CONSTRUCTION⚠️</a>
-            </div>
-        </div>
-    </div>
+<h2>Services</h2>
+<div class="services">
+<div class="service"><div><span>AI Engine</span><span>🟢</span></div></div>
+<div class="service"><div><span>Voice Assistant</span><span>🟢</span></div></div>
+<div class="service"><div><span>Wake Word Listener</span><span>🟢</span></div></div>
+<div class="service"><div><span>Memory System</span><span>🟢</span></div></div>
+<div class="service"><div><span>Face Recognition</span><span>🟢</span></div></div>
+<div class="service"><div><span>Security Layer</span><span>🟢</span></div></div>
+<div class="service"><div><span>Ollama Backend</span><span>🟢</span></div></div>
+</div>
 
-    <div id="mobile" class="page">
-        <div class="hero">
-            <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=800&auto=format&fit=crop" alt="Mobile UI">
-            </div>
-            <div class="hero-content" style="margin-left: 40px;">
-                <h1>Mobile Uplink</h1>
-                <p>Take J.A.R.V.I.S. with you. The upcoming mobile application will sync seamlessly with your desktop core, providing voice-activated assistance, real-time GPS integration, and environmental scanning on the go.</p>
-                <p style="color: var(--cyan); margin-bottom: 20px; font-weight: bold;">Status: In Active Development</p>
-                <a onclick="openBetaModal()" class="btn">Join Beta Waitlist</a>
-            </div>
-        </div>
-    </div>
+<h2 style="margin:30px 0 15px">Recent Incidents</h2>
+<div class="incident">
+<h3>Failed Spotify Access</h3>
+<p>Resolved but feature only available on Premium Accounts.</p>
+</div>
 
-    <div id="contact" class="page">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h2>Secure Comms & Feedback</h2>
-            <p style="font-size: 1.2rem; color: #b2ebf2; max-width: 700px; margin: 15px auto;">
-                Have a feature request, module upgrade recommendation, or want to provide an honest review of your J.A.R.V.I.S. experience? Transmit your data below. We actively monitor user feedback to continuously improve system protocols.
-            </p>
-        </div>
+<h2 style="margin:30px 0 15px">Incident History</h2>
+<div class="history">
+<div class="item"><strong>Failed Spotify Access</strong><br>JARVIS is currently unable to authenticate or stream music from the Spotify API.</div>
+<div class="item"><strong>Settings Sidebar not alligning properly</strong><br>A visual bug is causing the settings sidebar layout to overlap with the main view.</div>
+<div class="item"><strong>Voice Recognition Delay</strong><br>Wake-word processing latency affected some users. Issue resolved.</div>
+<div class="item"><strong>Scheduled Ollama Upgrade</strong><br>Backend infrastructure upgraded successfully.</div>
+<div class="item"><strong>Memory Database Optimisation</strong><br>Improved retrieval performance.</div>
+<div class="item"><strong>Face Recognition Improvements</strong><br>Authentication accuracy increased.</div>
+<div class="item"><strong>JARVIS Core Update</strong><br>Performance and stability enhancements.</div>
+<div class="item"><strong>Voice Engine Upgrade</strong><br>Reduced recognition errors.</div>
+<div class="item"><strong>Security Maintenance</strong><br>Routine security improvements.</div>
+</div>
 
-        <div class="form-container">
-            <form id="contactForm" onsubmit="submitForm(event, 'Feedback transmitted successfully. Thank you for your input.', 'contactForm')">
-                <div class="form-group">
-                    <label for="contactEmail">Uplink Email Address</label>
-                    <input type="email" id="contactEmail" class="form-control" placeholder="tony.stark@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="contactDesc">Transmission / Review Description</label>
-                    <textarea id="contactDesc" class="form-control" placeholder="Enter your review, bug report, or upgrade recommendation here..." required></textarea>
-                </div>
-                
-                <div class="form-group" style="margin-top: 15px; margin-bottom: 25px;">
-                    <div class="g-recaptcha" data-sitekey="6Ld2jzItAAAAAAMzinUa2_6irxSZ61t-8k1qv3ls"></div>
-                </div>
+<footer>© 2026 JARVIS Status</footer>
+</div>
+<script>
+const modal = document.getElementById("subscribeModal");
 
-                <button type="submit" class="btn" style="width: 100%;">Transmit Data</button>
-            </form>
-        </div>
-    </div>
+document.getElementById("openModal").onclick = () => modal.style.display = "block";
 
-    <div class="modal-overlay" id="betaModal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeBetaModal()">X</span>
-            <h2 style="color: var(--cyan); margin-bottom: 20px; font-size: 1.8rem;">Beta Waitlist Uplink</h2>
-            <p style="color: #b2ebf2; margin-bottom: 20px;">Register your credentials to gain early access to the J.A.R.V.I.S. Mobile Module.</p>
-            
-            <form id="betaForm" onsubmit="submitForm(event, 'Beta registration confirmed. Welcome to the grid.', 'betaForm')">
-                <div class="form-group">
-                    <label for="betaEmail">Email Address</label>
-                    <input type="email" id="betaEmail" class="form-control" placeholder="Enter your email" required>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="betaConditions" required>
-                    <label for="betaConditions" style="margin: 0; color: #fff; font-family: 'Rajdhani', sans-serif;">I accept the conditions to be an official beta tester.</label>
-                </div>
+document.getElementById("closeModal").onclick = () => modal.style.display = "none";
 
-                <div class="form-group" style="margin-top: 15px; margin-bottom: 25px;">
-                    <div class="g-recaptcha" data-sitekey="6Ld2jzItAAAAAAMzinUa2_6irxSZ61t-8k1qv3ls"></div>
-                </div>
+window.onclick = (e) => {
+    if(e.target === modal){
+        modal.style.display = "none";
+    }
+};
 
-                <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Initialize Registration</button>
-            </form>
-        </div>
-    </div>
+document.getElementById("subscribeForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const captcha = grecaptcha.getResponse();
 
-    <div class="chatbot-btn" onclick="toggleChat()">
-        <img src="jarvis.png" alt="Chat">
-    </div>
+    if(!captcha){
+        alert("Please verify that you are not a robot.");
+        return;
+    }
 
-    <div class="chat-window" id="chatWindow">
-        <div class="chat-header">
-            <span>J.A.R.V.I.S. Terminal</span>
-            <span class="close-chat" onclick="toggleChat()">X</span>
-        </div>
-        <div class="chat-body" id="chatBody">
-            <div class="chat-msg msg-ai">Good evening. I am online and ready. How may I assist you today?</div>
-        </div>
-        <div class="chat-input">
-            <input type="text" id="userInput" placeholder="Enter command..." onkeypress="handleEnter(event)">
-            <button onclick="sendMessage()">SEND</button>
-        </div>
-    </div>
+    const button = document.querySelector(".submit-btn");
+    button.disabled = true;
+    button.innerText = "JARVIS Processing...";
 
-    <script>
-        // Mobile Menu Toggle
-        function toggleMobileMenu() {
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('active-menu');
-        }
-
-        // SPA Page Navigation
-        function showPage(pageId) {
-            // Change visible page
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Update active link styling
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            document.getElementById(pageId).classList.add('active');
-            document.getElementById('nav-' + pageId).classList.add('active');
-            
-            // Close mobile menu if it's open
-            const navLinks = document.getElementById('navLinks');
-            if (navLinks.classList.contains('active-menu')) {
-                navLinks.classList.remove('active-menu');
+    try{
+        const response = await fetch(
+            "https://script.google.com/macros/s/AKfycbz6hlieg_mNVRaTGZ-e73wtn-gmieKI3NGn-Q-Peob0n3vEQVo_klfwmmqFsRZtoB3K/exec",
+            {
+                method:"POST",
+                body:JSON.stringify({email:email})
             }
+        );
 
-            window.scrollTo(0, 0);
+        const result = await response.json();
+        button.disabled = false;
+        button.innerText = "Subscribe";
+
+        if(result.status === "success"){
+            document.getElementById("successCheck").style.display = "block";
+            this.style.display = "none";
         }
-
-        // Modal Logic
-        function openBetaModal() {
-            document.getElementById('betaModal').style.display = 'flex';
+        else if(result.status === "exists"){
+            document.getElementById("alreadySubscribed").style.display = "block";
+            this.style.display = "none";
         }
-
-        function closeBetaModal() {
-            document.getElementById('betaModal').style.display = 'none';
-        }
-
-        // Form Submit Simulation with reCAPTCHA Check
-        function submitForm(event, successMessage, formId) {
-            event.preventDefault(); // Prevent page reload
-            
-            // Check if reCAPTCHA was filled out
-            const form = document.getElementById(formId);
-            const recaptchaResponse = form.querySelector('.g-recaptcha-response').value;
-            
-            if (recaptchaResponse.length === 0) {
-                alert("Please verify that you are not a robot.");
-                return false;
-            }
-
-            alert(successMessage);
-            event.target.reset(); // Clear the form
-            grecaptcha.reset(); // Reset the reCAPTCHA widget
-
-            if (document.getElementById('betaModal').style.display === 'flex') {
-                closeBetaModal();
-            }
-        }
-
-        // Chatbot Logic
-        function toggleChat() {
-            const chat = document.getElementById('chatWindow');
-            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function handleEnter(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            if (!message) return;
-
-            const chatBody = document.getElementById('chatBody');
-
-            // 1. Display User Message
-            const userDiv = document.createElement('div');
-            userDiv.className = 'chat-msg msg-user';
-            userDiv.textContent = message;
-            chatBody.appendChild(userDiv);
-
-            input.value = '';
-            chatBody.scrollTop = chatBody.scrollHeight;
-
-            // 2. Process AI Response
-            setTimeout(() => {
-                const aiDiv = document.createElement('div');
-                aiDiv.className = 'chat-msg msg-ai';
-                
-                const lowerMsg = message.toLowerCase();
-                let aiResponse = "";
-
-                // Keyword Routing Logic
-                if (lowerMsg.includes('download') || lowerMsg.includes('install') || lowerMsg.includes('get jarvis')) {
-                    aiResponse = "Right away. I am redirecting you to the Desktop Access Terminal where you can download the core module for your specific operating system.";
-                    showPage('download');
-                } 
-                else if (lowerMsg.includes('contact') || lowerMsg.includes('feedback') || lowerMsg.includes('support') || lowerMsg.includes('reach out')) {
-                    aiResponse = "Opening the Secure Comms channel. You can transmit your feedback or contact the development team using the form here.";
-                    showPage('contact');
-                } 
-                else if (lowerMsg.includes('home') || lowerMsg.includes('overview') || lowerMsg.includes('main')) {
-                    aiResponse = "Returning you to the main System Overview.";
-                    showPage('home');
-                } 
-                else if (lowerMsg.includes('about') || lowerMsg.includes('protocol') || lowerMsg.includes('capabilities') || lowerMsg.includes('features')) {
-                    aiResponse = "Accessing System Protocols & Capabilities. Here you can view my core functions.";
-                    showPage('about');
-                } 
-                else if (lowerMsg.includes('mobile') || lowerMsg.includes('phone') || lowerMsg.includes('beta') || lowerMsg.includes('waitlist')) {
-                    aiResponse = "Routing you to the Mobile Uplink page where you can join the beta waitlist.";
-                    showPage('mobile');
-                } 
-                else if (lowerMsg.includes('hello') || lowerMsg.includes('hi') || lowerMsg.includes('hey')) {
-                    aiResponse = "Hello! I am online and ready. I can help you navigate this terminal, download the software, or contact the team. What do you need?";
-                }
-                else {
-                    aiResponse = "I am currently optimized to assist with terminal navigation. Try asking me how to download the system, view my protocols, or contact my developer.";
-                }
-
-                aiDiv.textContent = aiResponse;
-                chatBody.appendChild(aiDiv);
-                chatBody.scrollTop = chatBody.scrollHeight;
-            }, 600); // 600ms delay for a snappy but natural response feel
-        }
-    </script>
+    }
+    catch(error){
+        button.disabled = false;
+        button.innerText = "Subscribe";
+        alert("JARVIS connection error.");
+    }
+});
+</script>
 </body>
 </html>
